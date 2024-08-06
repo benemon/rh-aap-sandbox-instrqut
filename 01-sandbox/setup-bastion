@@ -47,7 +47,6 @@ admin_password='{{ common_password }}'
 
 bundle_install=true
 bundle_dir=/opt/ansible/bundle
-controller_license_file=/opt/ansible/manifest/manifest.zip
 
 pg_host='postgres'
 pg_port='5432'
