@@ -1,0 +1,23 @@
+slug: rh-aap-sandbox
+id: purxn9qfxtok
+title: Red Hat Ansible Automation Platform Sandbox
+description: ""
+icon: ./assets/ansible-automation-platform-200.png
+tags: []
+owner: hashicorp-field-ops
+developers:
+- ben.holmes@hashicorp.com
+maintenance: true
+idle_timeout: 21600
+timelimit: 21600
+lab_config:
+  overlay: false
+  width: 33
+  position: right
+  sidebar_enabled: true
+  feedback_recap_enabled: true
+  loadingMessages: true
+  lab_v2: false
+  override_challenge_layout: false
+  hideStopButton: false
+checksum: "8132253624177838934"

@@ -1,0 +1,17 @@
+#!/bin/bash
+set -eo pipefail
+##
+# This script is used to setup the bastion host for the sandbox...
+##
+
+# Allow instruqt time to inject variables and settings
+until [ -f /opt/instruqt/bootstrap/host-bootstrap-completed ] ; do
+    echo "Waiting for instruqt bootstrap to complete"
+    sleep 1
+done
+
+scp -o StrictHostKeyChecking=no -q /opt/ansible/setup.yml root@bastion:/opt/ansible/setup.yml
+scp -o StrictHostKeyChecking=no -q -r /opt/ansible/roles root@bastion:/opt/ansible/
+scp -o StrictHostKeyChecking=no -q -r /opt/ansible/manifest/manifest.zip root@bastion:/opt/ansible/manifest/manifest.zip
+
+exit 0
