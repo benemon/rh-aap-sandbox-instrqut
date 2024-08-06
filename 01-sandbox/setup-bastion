@@ -130,6 +130,7 @@ ansible-playbook setup.yml -e offline_token=$RHN_OFFLINE_TOKEN -e provided_sha_v
 
 tar -xf aap.tar.gz -C . --strip-components=1
 
+cp inventory instruqt-inventory/inventory.default
 cp instruqt-inventory/inventory inventory
 
 time ./setup.sh -i inventory -e domain_suffix=$_SANDBOX_ID.instruqt.io -e common_password=$_SANDBOX_ID

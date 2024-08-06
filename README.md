@@ -11,6 +11,8 @@ This Track requires the following environment variables to enable deployment:
 * RHN_USERNAME - used by the AAP installer to pull Execution Environment container images
 * RHN_PASSWORD - used by the AAP installer to pull Execution Environment container images
 
+NOTE: If the Offline Token is not used for over 30 days, it becomes stale and a new token must be generated.
+
 ## Docs for RH Portal API
 
 - [Getting started with Red Hat APIs

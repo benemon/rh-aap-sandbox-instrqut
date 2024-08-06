@@ -7,7 +7,6 @@ tags: []
 owner: hashicorp-field-ops
 developers:
 - ben.holmes@hashicorp.com
-maintenance: true
 idle_timeout: 21600
 timelimit: 21600
 lab_config:
@@ -20,4 +19,4 @@ lab_config:
   lab_v2: false
   override_challenge_layout: false
   hideStopButton: false
-checksum: "10539211030196105172"
+checksum: "13433057474147766743"
