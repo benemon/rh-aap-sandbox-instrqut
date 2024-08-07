@@ -8,8 +8,6 @@ This Track requires the following environment variables to enable deployment:
 
 * RHN_AAP_PACKAGE_CHECKSUM - used by the prerequisites role to download the appropriate offline installer for AAP
 * RHN_OFFLINE_TOKEN - the RH Portal token used to authenticate and authorise the bundle download
-* RHN_USERNAME - used by the AAP installer to pull Execution Environment container images
-* RHN_PASSWORD - used by the AAP installer to pull Execution Environment container images
 
 NOTE: If the Offline Token is not used for over 30 days, it becomes stale and a new token must be generated.
 
