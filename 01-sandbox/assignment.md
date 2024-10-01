@@ -4,19 +4,23 @@ id: 9wn0beriyhpe
 type: challenge
 title: Sandbox
 tabs:
-- title: Bastion
+- id: vuxqt46hwyd0
+  title: Bastion
   type: terminal
   hostname: bastion
   workdir: /opt/ansible
-- title: Ansible Controller
+- id: x3a1tz9qep0s
+  title: Ansible Controller
   type: website
   url: https://aap-controller.${_SANDBOX_ID}.instruqt.io
   new_window: true
-- title: Ansible Hub
+- id: pr3rf3tj20a5
+  title: Ansible Hub
   type: website
   url: https://aap-hub.${_SANDBOX_ID}.instruqt.io
   new_window: true
-- title: Event Driven Ansible
+- id: 9bmtsli4rbiq
+  title: Event Driven Ansible
   type: website
   url: https://eda-controller.${_SANDBOX_ID}.instruqt.io
   new_window: true

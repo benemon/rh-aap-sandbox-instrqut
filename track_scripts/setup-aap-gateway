@@ -1,0 +1,23 @@
+#!/bin/bash
+set -eo pipefail
+##
+# This script is used to setup the bastion host for the sandbox...
+##
+
+# Allow instruqt time to inject variables and settings
+until [ -f /opt/instruqt/bootstrap/host-bootstrap-completed ] ; do
+    echo "Waiting for instruqt bootstrap to complete"
+    sleep 1
+done
+
+mkdir -p /opt/ansible/certs
+
+curl -s -o /opt/ansible/certs/aap-gateway.crt -H "Metadata-Flavor: Google" \
+    "http://metadata.google.internal/computeMetadata/v1/instance/attributes/ssl-certificate"
+
+curl -s -o /opt/ansible/certs/aap-gateway.key -H "Metadata-Flavor: Google" \
+    "http://metadata.google.internal/computeMetadata/v1/instance/attributes/ssl-certificate-key"
+
+dnf -y install policycoreutils-python-utils rsync
+
+exit 0

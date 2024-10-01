@@ -133,8 +133,12 @@ tar -xf aap.tar.gz -C . --strip-components=1
 cp inventory instruqt-inventory/inventory.default
 cp instruqt-inventory/inventory inventory
 
-time ./setup.sh -i inventory -e domain_suffix=$_SANDBOX_ID.instruqt.io -e common_password=$_SANDBOX_ID
+if [ "$AAP_RUN_INSTALLER" = "true" ] || [ "$AAP_RUN_INSTALLER" = "1" ]; then
+    time ./setup.sh -i inventory -e domain_suffix=$_SANDBOX_ID.instruqt.io -e common_password=$_SANDBOX_ID
 
-# preload subscription manifest
-echo "{\"manifest\": \"$(base64 -w 0 manifest/manifest.zip)\"}" > manifest/manifest_payload.json
-curl -vk -u admin:$_SANDBOX_ID -H 'Content-Type:application/json' -X POST -d @manifest/manifest_payload.json https://aap-controller.${_SANDBOX_ID}.instruqt.io/api/v2/config/
+    # preload subscription manifest
+    echo "{\"manifest\": \"$(base64 -w 0 manifest/manifest.zip)\"}" > manifest/manifest_payload.json
+    curl -vk -u admin:$_SANDBOX_ID -H 'Content-Type:application/json' -X POST -d @manifest/manifest_payload.json https://aap-controller.${_SANDBOX_ID}.instruqt.io/api/v2/config/
+else
+    echo "AAP_RUN_INSTALLER is not set to true, skipping installation"
+fi
