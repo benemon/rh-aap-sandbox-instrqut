@@ -12,37 +12,45 @@ done
 
 # let's get all the certs and keys in one place
 # controller
-scp -o StrictHostKeyChecking=no -q root@aap-controller:/opt/ansible/certs/aap-controller.crt /opt/ansible/certs/aap-controller.crt
-scp -o StrictHostKeyChecking=no -q root@aap-controller:/opt/ansible/certs/aap-controller.key /opt/ansible/certs/aap-controller.key
+scp -o StrictHostKeyChecking=no -q root@controller:/opt/ansible/certs/controller.crt /opt/ansible/certs/controller.crt
+scp -o StrictHostKeyChecking=no -q root@controller:/opt/ansible/certs/controller.key /opt/ansible/certs/controller.key
 
 # hub
-scp -o StrictHostKeyChecking=no -q root@aap-hub:/opt/ansible/certs/aap-hub.crt /opt/ansible/certs/aap-hub.crt
-scp -o StrictHostKeyChecking=no -q root@aap-hub:/opt/ansible/certs/aap-hub.key /opt/ansible/certs/aap-hub.key
+scp -o StrictHostKeyChecking=no -q root@hub:/opt/ansible/certs/hub.crt /opt/ansible/certs/hub.crt
+scp -o StrictHostKeyChecking=no -q root@hub:/opt/ansible/certs/hub.key /opt/ansible/certs/hub.key
 
 # eda
-scp -o StrictHostKeyChecking=no -q root@eda-controller:/opt/ansible/certs/eda-controller.crt /opt/ansible/certs/eda-controller.crt
-scp -o StrictHostKeyChecking=no -q root@eda-controller:/opt/ansible/certs/eda-controller.key /opt/ansible/certs/eda-controller.key
+scp -o StrictHostKeyChecking=no -q root@eda:/opt/ansible/certs/eda.crt /opt/ansible/certs/eda.crt
+scp -o StrictHostKeyChecking=no -q root@eda:/opt/ansible/certs/eda.key /opt/ansible/certs/eda.key
 
+# gateway
+scp -o StrictHostKeyChecking=no -q root@gateway:/opt/ansible/certs/gateway.crt /opt/ansible/certs/gateway.crt
+scp -o StrictHostKeyChecking=no -q root@gateway:/opt/ansible/certs/gateway.key /opt/ansible/certs/gateway.key
 
 # bootstrap the inventory file
 pushd /opt/ansible/instruqt-inventory
 
 cat <<'EOF' > inventory
 [automationcontroller]
-aap-controller routable_hostname="aap-controller.{{ domain_suffix }}"
+controller routable_hostname="controller.{{ domain_suffix }}"
 
 [automationhub]
-aap-hub routable_hostname="aap-hub.{{ domain_suffix }}"
+hub routable_hostname="hub.{{ domain_suffix }}"
 
 [automationedacontroller]
-eda-controller routable_hostname="eda-controller.{{ domain_suffix }}"
+eda routable_hostname="eda.{{ domain_suffix }}"
+
+[automationgateway]
+gateway routable_hostname="gateway.{{ domain_suffix }}"
 
 [database]
 postgres
 
 [all:vars]
 enable_insights_collection=false
+
 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
 admin_password='{{ common_password }}'
 
 bundle_install=true
@@ -86,7 +94,7 @@ automationedacontroller_pg_password='{{ common_password }}'
 
 # This install will deploy SSO with sso_use_https=True
 # Keystore password is required for https enabled SSO
-# sso_keystore_password=''
+sso_keystore_password='{{ common_password }}'
 
 # This install will deploy a TLS enabled Automation Hub.
 # If for some reason this is not the behavior wanted one can
@@ -102,12 +110,32 @@ automationedacontroller_pg_password='{{ common_password }}'
 # If set, this will install a custom CA certificate to the system trust store.
 # custom_ca_cert=/path/to/ca.crt
 # Certificate and key to install in Automation Hub node
-automationhub_ssl_cert=/opt/ansible/certs/aap-hub.crt
-automationhub_ssl_key=/opt/ansible/certs/aap-hub.key
+automationhub_ssl_cert=/opt/ansible/certs/hub.crt
+automationhub_ssl_key=/opt/ansible/certs/hub.key
+
+# Automation Gateway configuration
+automationgateway_admin_email="admin@gateway.{{ domain_suffix }}"
+automationgateway_admin_password='{{ common_password }}'
+
+automationgateway_pg_host='postgres'
+automationgateway_pg_port=5432
+
+automationgateway_pg_database='automationgateway'
+automationgateway_pg_username='automationgateway'
+automationgateway_pg_password='{{ common_password }}'
+automationgateway_pg_sslmode='prefer'
+
+# The main automation gateway URL that clients will connect to (e.g. https://<load balancer host>).
+# If not specified, the first node in the [automationgateway] group will be used when needed.
+# automationgateway_main_url = ''
+
+# Certificate and key to install in Automation Gateway
+automationgateway_ssl_cert=/opt/ansible/certs/gateway.crt
+automationgateway_ssl_key=/opt/ansible/certs/gateway.key
 
 # Certificate and key to install in nginx for the web UI and API
-web_server_ssl_cert=/opt/ansible/certs/aap-controller.crt
-web_server_ssl_key=/opt/ansible/certs/aap-controller.key
+web_server_ssl_cert=/opt/ansible/certs/controller.crt
+web_server_ssl_key=/opt/ansible/certs/controller.key
 # Server-side SSL settings for PostgreSQL (when we are installing it).
 postgres_use_ssl=False
 # postgres_ssl_cert=/path/to/pgsql.crt
@@ -118,15 +146,13 @@ postgres_use_ssl=False
 # automationedacontroller_controller_verify_ssl = true
 #
 # Certificate and key to install in Automation Event-Driven Ansible controller node
-automationedacontroller_ssl_cert=/opt/ansible/certs/eda-controller.crt
-automationedacontroller_ssl_key=/opt/ansible/certs/eda-controller.key
+automationedacontroller_ssl_cert=/opt/ansible/certs/eda.crt
+automationedacontroller_ssl_key=/opt/ansible/certs/eda.key
 EOF
 
 popd
 
 pushd /opt/ansible
-
-ansible-playbook setup.yml -e offline_token=$RHN_OFFLINE_TOKEN -e provided_sha_value=$RHN_AAP_PACKAGE_CHECKSUM
 
 tar -xf aap.tar.gz -C . --strip-components=1
 
@@ -134,11 +160,11 @@ cp inventory instruqt-inventory/inventory.default
 cp instruqt-inventory/inventory inventory
 
 if [ "$AAP_RUN_INSTALLER" = "true" ] || [ "$AAP_RUN_INSTALLER" = "1" ]; then
-    time ./setup.sh -i inventory -e domain_suffix=$_SANDBOX_ID.instruqt.io -e common_password=$_SANDBOX_ID
-
-    # preload subscription manifest
+    echo "starting installation..."
+    time ./setup.sh -i inventory -e domain_suffix=$_SANDBOX_ID.instruqt.io -e common_password=$_SANDBOX_ID > /dev/null
     echo "{\"manifest\": \"$(base64 -w 0 manifest/manifest.zip)\"}" > manifest/manifest_payload.json
-    curl -vk -u admin:$_SANDBOX_ID -H 'Content-Type:application/json' -X POST -d @manifest/manifest_payload.json https://aap-controller.${_SANDBOX_ID}.instruqt.io/api/v2/config/
+    curl -vk -u admin:$_SANDBOX_ID -H 'Content-Type:application/json' -X POST -d @manifest/manifest_payload.json https://controller.${_SANDBOX_ID}.instruqt.io/api/v2/config/
+    echo "...installation complete"
 else
     echo "AAP_RUN_INSTALLER is not set to true, skipping installation"
 fi

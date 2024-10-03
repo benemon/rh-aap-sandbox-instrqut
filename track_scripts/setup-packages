@@ -10,8 +10,13 @@ until [ -f /opt/instruqt/bootstrap/host-bootstrap-completed ] ; do
     sleep 1
 done
 
-scp -o StrictHostKeyChecking=no -q /opt/ansible/setup.yml root@bastion:/opt/ansible/setup.yml
-scp -o StrictHostKeyChecking=no -q -r /opt/ansible/roles root@bastion:/opt/ansible/
 scp -o StrictHostKeyChecking=no -q -r /opt/ansible/manifest/manifest.zip root@bastion:/opt/ansible/manifest/manifest.zip
+
+pushd /opt/ansible
+
+ansible-playbook setup.yml -e offline_token=$RHN_OFFLINE_TOKEN -e provided_sha_value=$RHN_AAP_PACKAGE_CHECKSUM
+scp -o StrictHostKeyChecking=no -q /opt/ansible/aap.tar.gz root@bastion:/opt/ansible/aap.tar.gz
+
+popd
 
 exit 0

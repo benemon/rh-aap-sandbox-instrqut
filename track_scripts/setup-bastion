@@ -12,6 +12,15 @@ done
 
 mkdir -p /opt/ansible/{certs,instruqt-inventory,manifest}
 
-dnf install -y ansible-core policycoreutils-python-utils rsync
+dnf install -y ansible-core policycoreutils-python-utils rsync wget git-core vim 
+
+cat <<'EOF' >> /etc/ansible/ansible.cfg
+[defaults]
+forks=10
+pipelining = True
+
+[ssh_connection]
+ssh_args = -o ControlMaster=auto -o ControlPersist=60s
+EOF
 
 exit 0

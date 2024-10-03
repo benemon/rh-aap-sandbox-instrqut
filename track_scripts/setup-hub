@@ -12,10 +12,10 @@ done
 
 mkdir -p /opt/ansible/certs
 
-curl -s -o /opt/ansible/certs/aap-gateway.crt -H "Metadata-Flavor: Google" \
+curl -s -o /opt/ansible/certs/hub.crt -H "Metadata-Flavor: Google" \
     "http://metadata.google.internal/computeMetadata/v1/instance/attributes/ssl-certificate"
 
-curl -s -o /opt/ansible/certs/aap-gateway.key -H "Metadata-Flavor: Google" \
+curl -s -o /opt/ansible/certs/hub.key -H "Metadata-Flavor: Google" \
     "http://metadata.google.internal/computeMetadata/v1/instance/attributes/ssl-certificate-key"
 
 dnf -y install policycoreutils-python-utils rsync
